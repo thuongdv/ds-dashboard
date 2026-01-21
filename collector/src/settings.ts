@@ -11,9 +11,10 @@
  */
 
 import dotenv from "dotenv";
+import path from "node:path";
 
 // Load environment variables from .env file
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 /**
  * Validates that an environment variable exists and returns its value.
