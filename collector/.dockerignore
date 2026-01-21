@@ -1,0 +1,10 @@
+.git
+node_modules
+playwright-report
+playwright/.cache
+logs
+test-results
+*.log
+.azure
+.dockerignore
+Dockerfile
