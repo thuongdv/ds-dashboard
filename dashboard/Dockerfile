@@ -1,11 +1,11 @@
-# Build with repo root as context so shared files (e.g., dws-queues.json) are available.
+# Build with repo root as context so shared files (e.g., dws-queues.json, dws-report) are available.
 # Example: docker build -f dashboard/Dockerfile -t dashboard:v1 .
 
 # BUILD STAGE: install all deps (including dev) and build static assets
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install dependencies 
+# Install dependencies
 COPY dashboard/package*.json ./
 RUN npm install
 
@@ -13,6 +13,7 @@ RUN npm install
 COPY dashboard/ ./
 # utils.ts imports ../../dws-queues.json (project root), so place it at filesystem root
 COPY dws-queues.json /dws-queues.json
+# Also copy dws-report directory
 COPY dws-report/ /dws-report
 RUN npm run build
 
