@@ -1,5 +1,5 @@
 import * as pulumi from "@pulumi/pulumi";
-import * as factory from "./deployment/factory";
+import * as factory from "./src/deployment/factory";
 
 const config = new pulumi.Config();
 const serviceName = config.require("serviceName");
