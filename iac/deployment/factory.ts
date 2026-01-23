@@ -11,7 +11,7 @@ const registeredServices: {
 export function createService(name: string, config: Config): Service {
   const serviceConstructor = registeredServices[name];
   if (!serviceConstructor) {
-    throw new Error(`No service registered for stack ${name}`);
+    throw new Error(`No service registered for name ${name}`);
   }
   return new serviceConstructor(config);
 }
