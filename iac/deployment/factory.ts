@@ -1,11 +1,11 @@
 import { Config } from "@pulumi/pulumi";
-import ReactService from "./dashboard-service";
+import DashboardService from "./dashboard-service";
 import Service from "./service";
 
 const registeredServices: {
   [name: string]: { new (config: Config): Service };
 } = {
-  "react-service": ReactService,
+  "dashboard-service": DashboardService,
 };
 
 export function createService(name: string, config: Config): Service {

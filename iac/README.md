@@ -2,7 +2,7 @@ Infrastructure Visualization
 
 # 1. Traffic Flow Diagram (Mermaid)
 
-This diagram shows how a user request travels through your AWS resources to reach the application.
+This diagram shows how a user request travels through the AWS resources to reach the application.
 
 ```mermaid
 graph TD
@@ -32,7 +32,7 @@ graph TD
 
 # 2. Infrastructure Logic (Pseudo-Code)
 
-This is a high-level translation of your Pulumi code into plain English logic.
+This is a high-level translation of the Pulumi code into plain English logic.
 
 START INFRASTRUCTURE SETUP
 
