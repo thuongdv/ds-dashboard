@@ -44,7 +44,7 @@ export const ReportDetail: React.FC = () => {
       const index = Number.parseInt(reportId || "0", 10);
       const loadedReports = await loadReportByIndex(index);
 
-      const allTests = loadedReports.flatMap((report) => parseTestReport(report));
+      const allTests = loadedReports.flatMap((report) => parseTestReport(report, report.filename));
 
       // Calculate overall summary for chart
       const summary = calculateSummary(allTests);
@@ -90,7 +90,7 @@ export const ReportDetail: React.FC = () => {
           // Show multiple rows with timestamps
           for (const report of reports) {
             const displayName = report.filename || projectName;
-            const reportTests = parseTestReport(report);
+            const reportTests = parseTestReport(report, report.filename);
 
             // Use utility function to calculate summary
             summaries.push(calculateSummaryForTests(reportTests, displayName));
@@ -102,7 +102,7 @@ export const ReportDetail: React.FC = () => {
           }
         } else {
           // Show single row with project name only (no timestamp)
-          const allReportTests = reports.flatMap((r) => parseTestReport(r));
+          const allReportTests = reports.flatMap((r) => parseTestReport(r, r.filename));
 
           // Use utility function to calculate summary
           summaries.push(calculateSummaryForTests(allReportTests, projectName));

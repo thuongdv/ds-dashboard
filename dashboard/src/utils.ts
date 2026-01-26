@@ -4,8 +4,25 @@ import { FlakyTest, ProjectSummary, TestCase, TestReport, TestResult } from "./t
 
 export const PROJECT_NAMES = dwsQueues.map((queue) => queue.name);
 
-export function parseTestReport(data: TestReport): TestResult[] {
-  return data.data.Value;
+/**
+ * Extract project name from filename format: '<projectName>_<hh-mm-ss>'
+ * @param filename - Filename without extension (e.g., '02.) Account Payable_09-14-55')
+ * @returns Project name (e.g., '02.) Account Payable')
+ */
+function extractProjectNameFromFilename(filename: string): string {
+  // Filename format: <projectName>_<hh-mm-ss>
+  // Extract everything before the last underscore followed by time format
+  const match = /^(.+)_\d{2}-\d{2}-\d{2}$/.exec(filename);
+  return match ? match[1] : "";
+}
+
+export function parseTestReport(data: TestReport, filename?: string): TestResult[] {
+  const projectNameFromFile = filename ? extractProjectNameFromFilename(filename) : undefined;
+  return data.data.Value.map((test) => ({
+    ...test,
+    // Override projectName with the one extracted from filename if available
+    projectName: projectNameFromFile || test.projectName,
+  }));
 }
 
 export function calculateSummary(testResults: TestResult[]): { total: number; passed: number; notPassed: number } {
