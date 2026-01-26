@@ -11,6 +11,13 @@ SCREENSHOTS_SOURCE="$SCRIPT_DIR/../../dws-report/reports/screenshots"
 
 mkdir -p "$PUBLIC_DIR"
 
+# Check if source screenshots directory exists
+if [ ! -d "$SCREENSHOTS_SOURCE" ]; then
+  echo "Error: Screenshots source directory does not exist: $SCREENSHOTS_SOURCE"
+  echo "Please run the collector to generate test reports and screenshots first."
+  exit 1
+fi
+
 # Remove existing screenshots path if it conflicts
 if [ -L "$PUBLIC_DIR/screenshots" ] || [ -f "$PUBLIC_DIR/screenshots" ]; then
   rm -f "$PUBLIC_DIR/screenshots"

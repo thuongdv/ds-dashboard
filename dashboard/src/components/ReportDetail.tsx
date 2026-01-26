@@ -228,7 +228,9 @@ export const ReportDetail: React.FC = () => {
   };
 
   const handleImageError = () => {
-    setScreenshotModal((prev) => ({ ...prev, loading: false }));
+    // Stop showing the loader, clear the URL to avoid a broken <img>, and notify the user.
+    setScreenshotModal((prev) => ({ ...prev, loading: false, url: "" }));
+    alert("Failed to load screenshot. The screenshot file may be missing or unavailable.");
   };
 
   const copyTestNames = (projectName: string) => {
