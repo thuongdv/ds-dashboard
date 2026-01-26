@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup:dev": "node -e \"import('child_process').then(({execSync})=>{const isWin=process.platform==='win32';const cmd=isWin?'scripts\\\\\\\\setup-dev.bat':'bash scripts/setup-dev.sh';execSync(cmd,{stdio:'inherit'})})\"",
+    "setup:dev": "node scripts/setup-dev.js",
     "setup:dev:unix": "bash scripts/setup-dev.sh",
     "setup:dev:win": "scripts\\setup-dev.bat",
     "dev": "vite",
