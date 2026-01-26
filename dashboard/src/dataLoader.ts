@@ -68,7 +68,7 @@ export async function loadAllReports(): Promise<ReportData[]> {
 
 export function generateSummaryRows(reportsData: ReportData[]): SummaryRow[] {
   return reportsData.map((reportData, index) => {
-    const allTests = reportData.reports.flatMap((report) => parseTestReport(report));
+    const allTests = reportData.reports.flatMap((report) => parseTestReport(report, report.filename));
     const summary = calculateSummary(allTests);
 
     return {

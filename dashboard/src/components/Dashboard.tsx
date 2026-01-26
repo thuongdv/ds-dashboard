@@ -40,7 +40,7 @@ export const Dashboard: React.FC = () => {
       setSummaryRows(summary);
 
       // Calculate flaky tests across all reports
-      const allTests = reportsData.flatMap((rd: ReportData) => rd.reports.flatMap((report) => parseTestReport(report)));
+      const allTests = reportsData.flatMap((rd: ReportData) => rd.reports.flatMap((report) => parseTestReport(report, report.filename)));
 
       const flakyMap = new Map<string, FlakyTest[]>();
       for (const projectName of PROJECT_NAMES) {

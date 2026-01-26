@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { mockFlakyTestData, mockTestReport, mockTestReportMultiple } from "./test/mockData.js";
+import type { TestReport } from "./types.js";
 import {
   calculateFlakyTests,
   calculatePassedRate,
@@ -26,6 +27,74 @@ describe("utils", () => {
       const emptyReport = { data: { Value: [] } };
       const results = parseTestReport(emptyReport);
       expect(results).toHaveLength(0);
+    });
+
+    it("should override projectName when filename is provided", () => {
+      const results = parseTestReport(mockTestReport, "02.) Account Payable_09-14-55");
+      expect(results).toHaveLength(2);
+      expect(results[0].projectName).toBe("02.) Account Payable");
+      expect(results[1].projectName).toBe("02.) Account Payable");
+    });
+
+    it("should preserve original projectName when no filename is provided", () => {
+      const results = parseTestReport(mockTestReport);
+      expect(results).toHaveLength(2);
+      expect(results[0].projectName).toBe("01.) JDEdwards Finance");
+      expect(results[1].projectName).toBe("01.) JDEdwards Finance");
+    });
+
+    it("should handle project names with special characters in filename", () => {
+      const results = parseTestReport(mockTestReport, "05.) Procurement_14-30-00");
+      expect(results).toHaveLength(2);
+      expect(results[0].projectName).toBe("05.) Procurement");
+      expect(results[1].projectName).toBe("05.) Procurement");
+    });
+
+    it("should preserve original projectName when filename doesn't match expected pattern", () => {
+      const results = parseTestReport(mockTestReport, "invalid-filename");
+      expect(results).toHaveLength(2);
+      // Should fall back to original projectName when extraction returns empty string
+      expect(results[0].projectName).toBe("01.) JDEdwards Finance");
+      expect(results[1].projectName).toBe("01.) JDEdwards Finance");
+    });
+
+    it("should handle project names containing underscores in filename", () => {
+      const testReport: TestReport = {
+        data: {
+          Value: [
+            {
+              ...mockTestReport.data.Value[0],
+              projectName: "Original Project",
+            },
+          ],
+        },
+      };
+      const results = parseTestReport(testReport, "Project_With_Underscores_10-20-30");
+      expect(results).toHaveLength(1);
+      expect(results[0].projectName).toBe("Project_With_Underscores");
+    });
+
+    it("should extract project name with parentheses and dots from filename", () => {
+      const results = parseTestReport(mockTestReport, "01.) JDEdwards Finance_15-45-30");
+      expect(results).toHaveLength(2);
+      expect(results[0].projectName).toBe("01.) JDEdwards Finance");
+      expect(results[1].projectName).toBe("01.) JDEdwards Finance");
+    });
+
+    it("should handle filename with only time pattern", () => {
+      const results = parseTestReport(mockTestReport, "09-14-55");
+      expect(results).toHaveLength(2);
+      // Should fall back to original projectName when pattern doesn't match
+      expect(results[0].projectName).toBe("01.) JDEdwards Finance");
+      expect(results[1].projectName).toBe("01.) JDEdwards Finance");
+    });
+
+    it("should handle empty filename string", () => {
+      const results = parseTestReport(mockTestReport, "");
+      expect(results).toHaveLength(2);
+      // Empty string should not extract anything, fall back to original
+      expect(results[0].projectName).toBe("01.) JDEdwards Finance");
+      expect(results[1].projectName).toBe("01.) JDEdwards Finance");
     });
   });
 
