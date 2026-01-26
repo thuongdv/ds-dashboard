@@ -78,8 +78,15 @@ END INFRASTRUCTURE SETUP
 
 # 3. Key Takeaways
 
-1. Strict Security: The Fargate tasks (your app) are effectively invisible to the public internet. They only accept traffic specifically from your Load Balancer on port 8080.
+1. **Strict Security**: The Fargate tasks (your app) are effectively invisible to the public internet. They only accept traffic specifically from your Load Balancer on port 8080.
 
-2. Sidecar Magic: HAProxy and Nginx live in the same "house" (Task). They talk to each other without leaving the server, ensuring max speed.
+2. **Sidecar Magic**: HAProxy and Nginx live in the same "house" (Task). They talk to each other without leaving the server, ensuring max speed.
 
-3. Self-Healing: If a Fargate task crashes, the ECS Service will automatically notice (via the Target Group health check) and spin up a new replacement.
+3. **Self-Healing**: If a Fargate task crashes, the ECS Service will automatically notice (via the Target Group health check) and spin up a new replacement.
+
+4. **High Availability (Why 2 Tasks?)**: Running 2 tasks (Task A and Task B) provides:
+   - **Zero Downtime**: If one task fails or needs updating, the other continues serving traffic
+   - **Load Distribution**: The ALB distributes incoming requests across both tasks, preventing overload
+   - **Redundancy**: Protection against single-point-of-failure scenarios
+   - **Rolling Updates**: During deployments, new tasks start before old ones stop, ensuring continuous service
+   - **Production Best Practice**: Even for small apps, running ≥2 instances is standard for reliability
