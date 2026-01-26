@@ -26,9 +26,20 @@ A React.js dashboard for visualizing automated test results from DWS reports.
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
+
+3. **Set up development environment** (creates symlink to screenshots):
+
+   ```bash
+   npm run setup:dev
+   ```
+
+   > **Note**: This step is required for screenshots to display in development mode. It creates a symlink from `public/dws-report/reports/screenshots` to the actual screenshots folder.
+   >
+   > On Windows, you may need to run the command prompt as Administrator, or enable Developer Mode in Windows Settings.
 
 ### Development
 
