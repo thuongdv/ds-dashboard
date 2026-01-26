@@ -23,7 +23,8 @@ WORKDIR /usr/share/nginx/html
 
 # Copy built assets
 COPY --from=builder /app/dist ./
-COPY --from=builder /dws-report /dws-report
+# Copy screenshots to be served at /screenshots/
+COPY --from=builder /dws-report/reports/screenshots ./screenshots
 EXPOSE 80
 
 # Default nginx entrypoint

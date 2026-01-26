@@ -6,7 +6,7 @@ dist-ssr
 coverage
 
 # Public symlinks (created by setup script)
-public/dws-report
+public/screenshots
 
 # Editor directories and files
 .vscode/*

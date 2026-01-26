@@ -4,19 +4,29 @@
 
 echo "Setting up development environment..."
 
-# Create public directory structure and symlink screenshots
-PUBLIC_DIR="$(dirname "$0")/../public/dws-report/reports"
-SCREENSHOTS_SOURCE="$(dirname "$0")/../../dws-report/reports/screenshots"
+# Get absolute paths
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PUBLIC_DIR="$SCRIPT_DIR/../public"
+SCREENSHOTS_SOURCE="$SCRIPT_DIR/../../dws-report/reports/screenshots"
 
 mkdir -p "$PUBLIC_DIR"
 
-# Remove existing symlink if it exists
-if [ -L "$PUBLIC_DIR/screenshots" ]; then
-  rm "$PUBLIC_DIR/screenshots"
+# Remove existing screenshots path if it conflicts
+if [ -L "$PUBLIC_DIR/screenshots" ] || [ -f "$PUBLIC_DIR/screenshots" ]; then
+  rm -f "$PUBLIC_DIR/screenshots"
+elif [ -d "$PUBLIC_DIR/screenshots" ]; then
+  # If it's an empty directory, remove it; otherwise, fail with a clear message
+  if [ -z "$(ls -A "$PUBLIC_DIR/screenshots")" ]; then
+    rmdir "$PUBLIC_DIR/screenshots"
+  else
+    echo "Error: $PUBLIC_DIR/screenshots exists and is a non-empty directory."
+    echo "Please remove or rename it before re-running this setup script."
+    exit 1
+  fi
 fi
 
 # Create symlink to screenshots folder
 ln -sf "$SCREENSHOTS_SOURCE" "$PUBLIC_DIR/screenshots"
 
-echo "✓ Created symlink: public/dws-report/reports/screenshots -> dws-report/reports/screenshots"
+echo "✓ Created symlink: public/screenshots -> dws-report/reports/screenshots"
 echo "✓ Development environment setup complete!"

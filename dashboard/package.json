@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup:dev": "bash scripts/setup-dev.sh",
+    "setup:dev": "node scripts/setup-dev.js",
+    "setup:dev:unix": "bash scripts/setup-dev.sh",
+    "setup:dev:win": "scripts\\setup-dev.bat",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",

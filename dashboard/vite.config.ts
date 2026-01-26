@@ -11,7 +11,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Alias for static assets served from parent directory
+      // Alias for module imports from the parent dws-report directory
       "@dws-report": path.resolve(__dirname, "../dws-report"),
     },
   },
