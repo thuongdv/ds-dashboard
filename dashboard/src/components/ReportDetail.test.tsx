@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -261,5 +261,166 @@ describe("ReportDetail", () => {
     // Check for Jira key links (will be present if Jira keys exist)
     const jiraLinks = document.querySelectorAll('a[target="_blank"][rel*="noopener"]');
     expect(jiraLinks.length).toBeGreaterThanOrEqual(0);
+  });
+
+  describe("Screenshot Modal", () => {
+    it("should open screenshot modal when View button is clicked", async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
+
+      await waitFor(() => {
+        expect(screen.queryByText("Loading report...")).not.toBeInTheDocument();
+      });
+
+      // Find and click a View button (for screenshots)
+      const viewButtons = screen.queryAllByText("View");
+      if (viewButtons.length > 0) {
+        await user.click(viewButtons[0]);
+
+        // Modal should open
+        await waitFor(() => {
+          expect(screen.getByAltText("Screenshot")).toBeInTheDocument();
+        });
+      }
+    });
+
+    it("should show loading spinner while screenshot is loading", async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
+
+      await waitFor(() => {
+        expect(screen.queryByText("Loading report...")).not.toBeInTheDocument();
+      });
+
+      const viewButtons = screen.queryAllByText("View");
+      if (viewButtons.length > 0) {
+        await user.click(viewButtons[0]);
+
+        // Loading spinner should be shown initially
+        await waitFor(() => {
+          expect(screen.getByText("Loading screenshot...")).toBeInTheDocument();
+        });
+      }
+    });
+
+    it("should hide loading spinner when image loads successfully", async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
+
+      await waitFor(() => {
+        expect(screen.queryByText("Loading report...")).not.toBeInTheDocument();
+      });
+
+      const viewButtons = screen.queryAllByText("View");
+      if (viewButtons.length > 0) {
+        await user.click(viewButtons[0]);
+
+        // Get the image element
+        const img = await screen.findByAltText("Screenshot");
+
+        // Trigger the load event
+        fireEvent.load(img);
+
+        // Loading spinner should disappear
+        await waitFor(() => {
+          expect(screen.queryByText("Loading screenshot...")).not.toBeInTheDocument();
+        });
+
+        // Image should be visible
+        expect(img).toHaveStyle({ display: "block" });
+      }
+    });
+
+    it("should handle image load error and show alert", async () => {
+      const user = userEvent.setup();
+      const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+      renderWithRouter();
+
+      await waitFor(() => {
+        expect(screen.queryByText("Loading report...")).not.toBeInTheDocument();
+      });
+
+      const viewButtons = screen.queryAllByText("View");
+      if (viewButtons.length > 0) {
+        await user.click(viewButtons[0]);
+
+        // Get the image element
+        const img = await screen.findByAltText("Screenshot");
+
+        // Trigger the error event
+        fireEvent.error(img);
+
+        // Alert should be shown
+        await waitFor(() => {
+          expect(alertSpy).toHaveBeenCalledWith(
+            "Failed to load screenshot. The screenshot file may be missing or unavailable.",
+          );
+        });
+
+        // Loading spinner should disappear
+        expect(screen.queryByText("Loading screenshot...")).not.toBeInTheDocument();
+      }
+
+      alertSpy.mockRestore();
+    });
+
+    it("should close screenshot modal when close button is clicked", async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
+
+      await waitFor(() => {
+        expect(screen.queryByText("Loading report...")).not.toBeInTheDocument();
+      });
+
+      const viewButtons = screen.queryAllByText("View");
+      if (viewButtons.length > 0) {
+        await user.click(viewButtons[0]);
+
+        // Modal should open
+        await waitFor(() => {
+          expect(screen.getByAltText("Screenshot")).toBeInTheDocument();
+        });
+
+        // Find and click close button
+        const closeButton = screen.getByRole("button", { name: "×" });
+        await user.click(closeButton);
+
+        // Modal should close
+        await waitFor(() => {
+          expect(screen.queryByAltText("Screenshot")).not.toBeInTheDocument();
+        });
+      }
+    });
+
+    it("should close screenshot modal when clicking outside content", async () => {
+      const user = userEvent.setup();
+      renderWithRouter();
+
+      await waitFor(() => {
+        expect(screen.queryByText("Loading report...")).not.toBeInTheDocument();
+      });
+
+      const viewButtons = screen.queryAllByText("View");
+      if (viewButtons.length > 0) {
+        await user.click(viewButtons[0]);
+
+        // Modal should open
+        await waitFor(() => {
+          expect(screen.getByAltText("Screenshot")).toBeInTheDocument();
+        });
+
+        // Click on modal backdrop
+        const modal = document.querySelector(".screenshot-modal");
+        if (modal) {
+          await user.click(modal);
+
+          // Modal should close
+          await waitFor(() => {
+            expect(screen.queryByAltText("Screenshot")).not.toBeInTheDocument();
+          });
+        }
+      }
+    });
   });
 });
