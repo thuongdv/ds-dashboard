@@ -15,6 +15,10 @@ COPY dashboard/ ./
 COPY dws-queues.json /dws-queues.json
 # Also copy dws-report directory
 COPY dws-report/ /dws-report
+# Remove broken symlink from dev environment and copy actual screenshots
+RUN rm -rf /app/public/screenshots && \
+  mkdir -p /app/public/screenshots && \
+  cp -r /dws-report/reports/screenshots /app/public/screenshots
 RUN npm run build
 
 # RUNTIME STAGE: serve static assets via nginx
