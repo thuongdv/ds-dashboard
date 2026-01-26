@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup:dev": "bash scripts/setup-dev.sh",
+    "setup:dev": "node -e \"const { execSync } = require('child_process'); const isWin = process.platform === 'win32'; const cmd = isWin ? 'scripts\\\\setup-dev.bat' : 'bash scripts/setup-dev.sh'; execSync(cmd, { stdio: 'inherit' });\"",
+    "setup:dev:unix": "bash scripts/setup-dev.sh",
+    "setup:dev:win": "scripts\\setup-dev.bat",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",

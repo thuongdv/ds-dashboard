@@ -33,13 +33,21 @@ A React.js dashboard for visualizing automated test results from DWS reports.
 
 3. **Set up development environment** (creates symlink to screenshots):
 
+   On macOS/Linux:
+
    ```bash
    npm run setup:dev
    ```
 
-   > **Note**: This step is required for screenshots to display in development mode. It creates a symlink from `public/dws-report/reports/screenshots` to the actual screenshots folder.
+   On Windows (from a Command Prompt or PowerShell opened in the `dashboard` directory):
+
+   ```bat
+   npm run setup:dev
+   ```
+
+   > **Note**: This step is required for screenshots to display in development mode. It creates a symlink from `public/screenshots` to the actual screenshots folder.
    >
-   > On Windows, you may need to run the command prompt as Administrator, or enable Developer Mode in Windows Settings.
+   > On Windows, you may need to run the command prompt or PowerShell as Administrator, or enable Developer Mode in Windows Settings, for symlink creation to succeed.
 
 ### Development
 

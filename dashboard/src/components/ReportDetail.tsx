@@ -209,11 +209,11 @@ export const ReportDetail: React.FC = () => {
     // Convert local relative paths to proper URLs
     let imageUrl = url;
     if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
-      // Local screenshot path - convert to absolute path from root
-      // Screenshots are stored at dws-report/reports/screenshots/, and cImageUrl contains relative path like "screenshots/..."
-      // Convert to "/dws-report/reports/screenshots/..." which works in both dev and production
+      // Local screenshot path - convert to absolute path from the current origin
+      // Collector emits relative paths like "screenshots/..." which are served alongside the app
+      // Normalize to "/screenshots/..." (or "/<relative-path>") without assuming a specific subdirectory
       if (!url.startsWith("/")) {
-        imageUrl = `/dws-report/reports/${url}`;
+        imageUrl = `/${url}`;
       }
     }
     setScreenshotModal({ isOpen: true, url: imageUrl, loading: true });
