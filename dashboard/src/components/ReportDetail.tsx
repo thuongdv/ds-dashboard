@@ -30,9 +30,10 @@ export const ReportDetail: React.FC = () => {
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set(PROJECT_NAMES));
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<any>(null);
-  const [screenshotModal, setScreenshotModal] = useState<{ isOpen: boolean; url: string }>({
+  const [screenshotModal, setScreenshotModal] = useState<{ isOpen: boolean; url: string; loading: boolean }>({
     isOpen: false,
     url: "",
+    loading: false,
   });
 
   useEffect(() => {
@@ -208,15 +209,28 @@ export const ReportDetail: React.FC = () => {
     // Convert local relative paths to proper URLs
     let imageUrl = url;
     if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
-      // Local screenshot path - use Vite's /@fs/ prefix with absolute path
-      // The __DWS_REPORT_PATH__ is defined in vite.config.ts and points to the dws-report/reports directory
-      imageUrl = `/@fs/${__DWS_REPORT_PATH__}/${url}`;
+      // Local screenshot path - convert to absolute path from the current origin
+      // Collector emits relative paths like "screenshots/..." which are served alongside the app
+      // Normalize to "/screenshots/..." (or "/<relative-path>") without assuming a specific subdirectory
+      if (!url.startsWith("/")) {
+        imageUrl = `/${url}`;
+      }
     }
-    setScreenshotModal({ isOpen: true, url: imageUrl });
+    setScreenshotModal({ isOpen: true, url: imageUrl, loading: true });
   };
 
   const closeScreenshotModal = () => {
-    setScreenshotModal({ isOpen: false, url: "" });
+    setScreenshotModal({ isOpen: false, url: "", loading: false });
+  };
+
+  const handleImageLoad = () => {
+    setScreenshotModal((prev) => ({ ...prev, loading: false }));
+  };
+
+  const handleImageError = () => {
+    // Stop showing the loader, clear the URL to avoid a broken <img>, and notify the user.
+    setScreenshotModal((prev) => ({ ...prev, loading: false, url: "" }));
+    alert("Failed to load screenshot. The screenshot file may be missing or unavailable.");
   };
 
   const copyTestNames = (projectName: string) => {
@@ -575,7 +589,20 @@ export const ReportDetail: React.FC = () => {
             <button className="screenshot-modal-close" onClick={closeScreenshotModal} type="button">
               ×
             </button>
-            <img src={screenshotModal.url} alt="Screenshot" className="screenshot-modal-image" />
+            {screenshotModal.loading && (
+              <div className="screenshot-loading">
+                <div className="spinner" />
+                <p>Loading screenshot...</p>
+              </div>
+            )}
+            <img
+              src={screenshotModal.url}
+              alt="Screenshot"
+              className="screenshot-modal-image"
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              style={{ display: screenshotModal.loading ? "none" : "block" }}
+            />
           </div>
         </div>
       )}

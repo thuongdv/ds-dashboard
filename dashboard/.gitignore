@@ -5,6 +5,9 @@ dist-ssr
 .DS_Store
 coverage
 
+# Public symlinks (created by setup script)
+public/screenshots
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

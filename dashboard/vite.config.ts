@@ -9,15 +9,16 @@ export default defineConfig({
   build: {
     outDir: "dist",
   },
+  resolve: {
+    alias: {
+      // Alias for module imports from the parent dws-report directory
+      "@dws-report": path.resolve(__dirname, "../dws-report"),
+    },
+  },
   server: {
     fs: {
       // Allow serving files from the parent directory's dws-report folder
       allow: [path.resolve(__dirname, "..")],
-      strict: false,
     },
-  },
-  define: {
-    // Make the dws-report path available as a constant
-    __DWS_REPORT_PATH__: JSON.stringify(path.resolve(__dirname, "../dws-report/reports")),
   },
 });
