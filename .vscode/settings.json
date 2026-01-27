@@ -28,7 +28,8 @@
     "cnlocalhost",
     "ssrreactexample",
     "keyout",
-    "healthcheck"
+    "healthcheck",
+    "awsx"
   ],
   "cSpell.ignorePaths": [
     "**/node_modules/**",
