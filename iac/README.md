@@ -108,7 +108,7 @@ START INFRASTRUCTURE SETUP
         - CPU: 0.25 vCPU
         - RAM: 512 MB
         - CONTAINER 1 "HAProxy":
-            - Image: Your Custom Image (haproxy.cfg included)
+            - Image: The Custom Image (haproxy.cfg included)
             - Expose Port: 8080
         - CONTAINER 2 "Nginx":
             - Image: Official Nginx
@@ -128,7 +128,7 @@ END INFRASTRUCTURE SETUP
 
 # 3. Key Takeaways
 
-1. **Strict Security**: The Fargate tasks (your app) are effectively invisible to the public internet. They only accept traffic specifically from your Load Balancer on port 8080.
+1. **Strict Security**: The Fargate tasks (the app) are effectively invisible to the public internet. They only accept traffic specifically from the Load Balancer on port 8080.
 
 2. **Sidecar Magic**: HAProxy and Nginx live in the same "house" (Task). They talk to each other without leaving the server, ensuring max speed.
 
