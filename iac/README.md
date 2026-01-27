@@ -8,6 +8,7 @@ This diagram visualizes the complete flow: from User Traffic to Cost-Optimized C
 graph TD
     Users[👥 Users] -->|Browse| Internet[🌐 Internet]
     Internet -->|HTTPS:443| IGW[Internet Gateway]
+    Internet -->|HTTP:80| IGW
 
     subgraph VPC[VPC - Custom Virtual Private Cloud]
         IGW -->|Route to ALB| ALB[Application Load Balancer]
