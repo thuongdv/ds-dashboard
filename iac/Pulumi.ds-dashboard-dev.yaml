@@ -1,2 +1,5 @@
 config:
   iac:serviceName: dashboard-service
+  iac:environmentName: dev
+  iac:domainName: dashboard.ds-dashboard.abrdns.com
+  aws:region: us-east-1
