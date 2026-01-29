@@ -14,5 +14,25 @@ export function createTaskExecutionRole(): aws.iam.Role {
     policyArn: "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
   });
 
+  // Add permission to create CloudWatch log groups
+  const caller = aws.getCallerIdentity({});
+  const region = aws.getRegion({});
+
+  new aws.iam.RolePolicy(`${serviceName}-task-exec-logs-policy`, {
+    role: taskExecRole.id,
+    policy: pulumi.all([caller, region]).apply(([callerData, regionData]) =>
+      JSON.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Effect: "Allow",
+            Action: ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+            Resource: `arn:aws:logs:${regionData.region}:${callerData.accountId}:log-group:/ecs/haproxy-app:*`,
+          },
+        ],
+      }),
+    ),
+  });
+
   return taskExecRole;
 }

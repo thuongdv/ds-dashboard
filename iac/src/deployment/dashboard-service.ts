@@ -13,6 +13,8 @@ const config = new pulumi.Config();
 const awsConfig = new pulumi.Config("aws");
 const domainName = config.require("domainName");
 const region = awsConfig.require("region");
+const haproxyRepoUrl = config.require("haproxyEcrRepoUrl");
+const nginxRepoUrl = config.require("nginxEcrRepoUrl");
 const haproxyContainerName = "haproxy";
 
 export default class DashboardService extends Service {
@@ -75,7 +77,7 @@ export default class DashboardService extends Service {
       cpu: "256",
       memory: "512",
       executionRoleArn: iam.createTaskExecutionRole().arn,
-      containerDefinitions: this.containerDefinitions(haproxyRepo, nginxRepo),
+      containerDefinitions: this.containerDefinitions(),
     });
 
     // Create ECS Fargate Spot Service
@@ -95,14 +97,17 @@ export default class DashboardService extends Service {
       vpcId: vpcResources.vpcId,
       publicSubnetIds: vpcResources.publicSubnetIds.apply((ids) => ids.join(",")),
       privateSubnetIds: vpcResources.privateSubnetIds.apply((ids) => ids.join(",")),
+      haproxyRepoUrl: haproxyRepo.repositoryUrl,
+      nginxRepoUrl: nginxRepo.repositoryUrl,
+      albDnsName: albInstance.dnsName,
     };
   }
 
-  private containerDefinitions = (haproxyRepo: aws.ecr.Repository, nginxRepo: aws.ecr.Repository) => {
+  private containerDefinitions = () => {
     return pulumi.jsonStringify([
       {
         name: haproxyContainerName,
-        image: pulumi.interpolate`${haproxyRepo.repositoryUrl}:latest`,
+        image: haproxyRepoUrl,
         essential: true,
         portMappings: [{ containerPort: 8080 }],
         logConfiguration: {
@@ -117,7 +122,7 @@ export default class DashboardService extends Service {
       },
       {
         name: "nginx",
-        image: pulumi.interpolate`${nginxRepo.repositoryUrl}:latest`,
+        image: nginxRepoUrl,
         essential: true,
         portMappings: [{ containerPort: 80 }],
         logConfiguration: {

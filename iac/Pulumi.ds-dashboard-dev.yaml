@@ -2,4 +2,6 @@ config:
   iac:serviceName: dashboard-service
   iac:environmentName: dev
   iac:domainName: dashboard.ds-dashboard.abrdns.com
+  iac:haproxyEcrRepoUrl: 077024820570.dkr.ecr.us-east-1.amazonaws.com/dashboard-haproxy:latest
+  iac:nginxEcrRepoUrl: 077024820570.dkr.ecr.us-east-1.amazonaws.com/dashboard-nginx:latest
   aws:region: us-east-1
