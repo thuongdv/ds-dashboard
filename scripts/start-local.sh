@@ -2,7 +2,8 @@
 set -e
 
 echo "Building React application..."
-npm run build
+npm --prefix ./dashboard install
+npm --prefix ./dashboard run build
 
 echo "Building and starting Docker containers..."
 docker compose up --build -d

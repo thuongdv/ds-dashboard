@@ -123,6 +123,6 @@ END INFRASTRUCTURE SETUP
    - **Rolling Updates**: During deployments, new tasks start before old ones stop, ensuring continuous service
    - **Production Best Practice**: Even for small apps, running ≥2 instances is standard for reliability
 
-5. **Observability**: A CloudWatch Dashboard is automatically provisioned, giving immediate visibility into CPU, RAM, and Traffic without manual setup.
+5. **Observability**: CloudWatch Log Groups are automatically provisioned for centralized logging, allowing you to monitor and debug your application without manual setup.
 
 6. **Cost Efficiency (Spot)**: The service is configured to use Fargate Spot, reducing compute costs by approximately 70% compared to on-demand pricing.
