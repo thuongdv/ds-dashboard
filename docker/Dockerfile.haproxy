@@ -1,0 +1,10 @@
+FROM haproxy:3.3.1-alpine
+
+# Copy HAProxy configuration
+COPY docker/haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+
+# Expose ports (80 for HTTP redirect, 443 for HTTPS)
+EXPOSE 80 443
+
+# Run HAProxy
+CMD ["haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg", "-db"]

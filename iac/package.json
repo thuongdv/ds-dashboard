@@ -2,11 +2,13 @@
     "name": "iac",
     "main": "index.ts",
     "devDependencies": {
+        "@trivago/prettier-plugin-sort-imports": "6.0.2",
         "@types/node": "25.0.10",
         "typescript": "5.9.3"
     },
     "dependencies": {
-        "@pulumi/aws": "^7.16.0",
-        "@pulumi/pulumi": "^3.216.0"
+        "@pulumi/aws": "7.16.0",
+        "@pulumi/awsx": "3.1.0",
+        "@pulumi/pulumi": "3.216.0"
     }
 }
