@@ -1,20 +1,28 @@
+import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 
 import * as acm from "../cloud/aws/acm";
 import * as alb from "../cloud/aws/alb";
+import * as cloudwatch from "../cloud/aws/cloudwatch";
 import * as ec2 from "../cloud/aws/ec2";
-import * as ecr from "../cloud/aws/ecr";
 import * as ecs from "../cloud/aws/ecs";
 import * as iam from "../cloud/aws/iam";
 import * as vpc from "../cloud/aws/vpc";
 import Service from "./service";
 
 const config = new pulumi.Config();
-const awsConfig = new pulumi.Config("aws");
 const domainName = config.require("domainName");
-const region = awsConfig.require("region");
 const haproxyRepoUrl = config.require("haproxyEcrRepoUrl");
 const nginxRepoUrl = config.require("nginxEcrRepoUrl");
+const numberOfAzs = config.getNumber("numberOfAzs") || 2;
+const logRetentionInDays = config.getNumber("logRetentionInDays") || 7;
+const fargateDesiredCount = config.getNumber("fargateDesiredCount") || 2;
+const fargateCpu = config.get("fargateCpu") || "256";
+const fargateMemory = config.get("fargateMemory") || "512";
+
+const awsConfig = new pulumi.Config("aws");
+const region = awsConfig.require("region");
+
 const haproxyContainerName = "haproxy";
 
 export default class DashboardService extends Service {
@@ -24,11 +32,7 @@ export default class DashboardService extends Service {
     // This enables internet access for public subnets
     // Create public subnets in different availability zones
     // Create a route table and associate it with the public subnets
-    const vpcResources = vpc.createVpc({ name: "dashboard-vpc", numberOfAvailabilityZones: 2 });
-
-    // Create ECR repositories
-    const haproxyRepo = ecr.createEcrRepository("dashboard-haproxy");
-    const nginxRepo = ecr.createEcrRepository("dashboard-nginx");
+    const vpcResources = vpc.createVpc({ name: "dashboard-vpc", numberOfAvailabilityZones: numberOfAzs });
 
     // Create ALB security groups
     const albSg = ec2.createHttpOnlySecurityGroup({
@@ -72,6 +76,12 @@ export default class DashboardService extends Service {
       targetGroupArn: albTargetGroup.arn,
     });
 
+    // Create CloudWatch Log Group with 7-day retention
+    const logGroup = cloudwatch.createLogGroup({
+      name: "ecs/dashboard-app",
+      retentionInDays: logRetentionInDays,
+    });
+
     // Create ECS cluster
     const ecsCluster = ecs.createEcsCluster({
       clusterName: "dashboard-ecs-cluster",
@@ -81,17 +91,17 @@ export default class DashboardService extends Service {
     const taskDefinition = ecs.createEcsFargateTaskDefinition({
       taskName: "dashboard-task-def",
       family: "dashboard-family",
-      cpu: "256",
-      memory: "512",
+      cpu: fargateCpu,
+      memory: fargateMemory,
       executionRoleArn: iam.createTaskExecutionRole().arn,
-      containerDefinitions: this.containerDefinitions(),
+      containerDefinitions: this.containerDefinitions(logGroup),
     });
 
     // Create ECS Fargate Spot Service
     ecs.createEcsFargateSpotService({
       serviceName: "dashboard-ecs-service",
       clusterArn: ecsCluster.arn,
-      desiredCount: 2,
+      desiredCount: fargateDesiredCount,
       taskDefinitionArn: taskDefinition.arn,
       vpcSubnetIds: vpcResources.publicSubnetIds,
       vpcSecurityGroupIds: fargateSg.id.apply((id) => [id]),
@@ -103,14 +113,18 @@ export default class DashboardService extends Service {
     return {
       vpcId: vpcResources.vpcId,
       publicSubnetIds: vpcResources.publicSubnetIds.apply((ids) => ids.join(",")),
-      privateSubnetIds: vpcResources.privateSubnetIds.apply((ids) => ids.join(",")),
-      haproxyRepoUrl: haproxyRepo.repositoryUrl,
-      nginxRepoUrl: nginxRepo.repositoryUrl,
+      haproxyRepoUrl: haproxyRepoUrl,
+      nginxRepoUrl: nginxRepoUrl,
       albDnsName: albInstance.dnsName,
+      albArn: albInstance.arn,
+      albSecurityGroupId: albSg.id,
+      fargateSecurityGroupId: fargateSg.id,
+      ecsClusterArn: ecsCluster.arn,
+      taskDefinitionArn: taskDefinition.arn,
     };
   }
 
-  private containerDefinitions = () => {
+  private containerDefinitions = (logGroup: aws.cloudwatch.LogGroup) => {
     return pulumi.jsonStringify([
       {
         name: haproxyContainerName,
@@ -127,10 +141,9 @@ export default class DashboardService extends Service {
         logConfiguration: {
           logDriver: "awslogs",
           options: {
-            "awslogs-group": "/ecs/haproxy-app",
+            "awslogs-group": logGroup.name,
             "awslogs-region": region,
             "awslogs-stream-prefix": haproxyContainerName,
-            "awslogs-create-group": "true",
           },
         },
       },
@@ -149,10 +162,9 @@ export default class DashboardService extends Service {
         logConfiguration: {
           logDriver: "awslogs",
           options: {
-            "awslogs-group": "/ecs/haproxy-app",
+            "awslogs-group": logGroup.name,
             "awslogs-region": region,
             "awslogs-stream-prefix": "nginx",
-            "awslogs-create-group": "true",
           },
         },
       },
