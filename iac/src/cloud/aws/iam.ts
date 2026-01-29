@@ -1,5 +1,6 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
+
 const config = new pulumi.Config();
 
 const serviceName = config.require("serviceName");
@@ -17,6 +18,8 @@ export function createTaskExecutionRole(): aws.iam.Role {
   // Add permission to create CloudWatch log groups
   const caller = aws.getCallerIdentity({});
   const region = aws.getRegion({});
+  const config = new pulumi.Config();
+  const logGroupName = config.require("logGroupName");
 
   new aws.iam.RolePolicy(`${serviceName}-task-exec-logs-policy`, {
     role: taskExecRole.id,
@@ -27,7 +30,7 @@ export function createTaskExecutionRole(): aws.iam.Role {
           {
             Effect: "Allow",
             Action: ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-            Resource: `arn:aws:logs:${regionData.region}:${callerData.accountId}:log-group:/ecs/haproxy-app:*`,
+            Resource: `arn:aws:logs:${regionData.region}:${callerData.accountId}:log-group:${logGroupName}:*`,
           },
         ],
       }),

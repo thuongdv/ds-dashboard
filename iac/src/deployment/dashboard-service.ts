@@ -14,11 +14,12 @@ const config = new pulumi.Config();
 const domainName = config.require("domainName");
 const haproxyRepoUrl = config.require("haproxyEcrRepoUrl");
 const nginxRepoUrl = config.require("nginxEcrRepoUrl");
-const numberOfAzs = config.getNumber("numberOfAzs") || 2;
-const logRetentionInDays = config.getNumber("logRetentionInDays") || 7;
-const fargateDesiredCount = config.getNumber("fargateDesiredCount") || 2;
+const numberOfAzs = config.getNumber("numberOfAzs") || 1;
+const logRetentionInDays = config.getNumber("logRetentionInDays") || 1;
+const fargateDesiredCount = config.getNumber("fargateDesiredCount") || 1;
 const fargateCpu = config.get("fargateCpu") || "256";
 const fargateMemory = config.get("fargateMemory") || "512";
+const haproxyLogGroupName = config.require("logGroupName");
 
 const awsConfig = new pulumi.Config("aws");
 const region = awsConfig.require("region");
@@ -78,7 +79,7 @@ export default class DashboardService extends Service {
 
     // Create CloudWatch Log Group with 7-day retention
     const logGroup = cloudwatch.createLogGroup({
-      name: "ecs/dashboard-app",
+      name: haproxyLogGroupName,
       retentionInDays: logRetentionInDays,
     });
 
