@@ -10,10 +10,10 @@ This document outlines the prerequisites and setup steps required before deployi
    curl -fsSL https://get.pulumi.com | sh
    ```
 
-2. **Node.js** (v18 or later)
+2. **Node.js** (v20 or later)
 
    ```bash
-   node --version  # Should be >= 18
+   node --version  # Should be >= 20
    ```
 
 3. **AWS CLI** configured with appropriate credentials
@@ -156,10 +156,11 @@ Expected outputs:
 
 - `vpcId`: VPC identifier
 - `publicSubnetIds`: Comma-separated list of public subnet IDs
-- `privateSubnetIds`: Comma-separated list of private subnet IDs
 - `haproxyRepoUrl`: HAProxy ECR repository URL
 - `nginxRepoUrl`: Nginx ECR repository URL
 - `albDnsName`: Application Load Balancer DNS name
+
+Additional outputs (such as security group IDs or ECS/task ARNs) may also be present; run `pulumi stack output` to see the full list.
 
 ## Post-Deployment
 
