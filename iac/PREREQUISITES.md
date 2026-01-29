@@ -268,6 +268,10 @@ aws ecr delete-repository --repository-name dashboard-nginx --force --region <yo
 - Enable VPC flow logs for network monitoring
 - Use AWS WAF if needed for additional protection
 - Regularly update container images with security patches
+- **HAProxy Stats Endpoint**: The default HAProxy configuration includes a stats endpoint (`/haproxy-stats`) with basic authentication using default credentials (`admin:changeme123`). Before deploying to production:
+  - Change the credentials in `docker/haproxy.cfg` to a strong password, OR
+  - Disable the stats endpoint entirely by commenting out the `stats` directives, OR
+  - Restrict access using network-level controls (security groups, VPC rules)
 
 ## Additional Resources
 
