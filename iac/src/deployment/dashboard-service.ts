@@ -1,12 +1,12 @@
 import * as pulumi from "@pulumi/pulumi";
-import * as vpc from "../cloud/aws/vpc";
+
+import * as acm from "../cloud/aws/acm";
 import * as alb from "../cloud/aws/alb";
 import * as ec2 from "../cloud/aws/ec2";
-import * as acm from "../cloud/aws/acm";
 import * as ecr from "../cloud/aws/ecr";
 import * as ecs from "../cloud/aws/ecs";
-import * as aws from "@pulumi/aws";
 import * as iam from "../cloud/aws/iam";
+import * as vpc from "../cloud/aws/vpc";
 import Service from "./service";
 
 const config = new pulumi.Config();
@@ -31,9 +31,16 @@ export default class DashboardService extends Service {
     const nginxRepo = ecr.createEcrRepository("dashboard-nginx");
 
     // Create ALB security groups
-    const albSg = ec2.createSecurityGroup({
+    const albSg = ec2.createHttpOnlySecurityGroup({
       name: "dashboard-alb-sg",
       vpcId: vpcResources.vpcId,
+    });
+
+    // Create Fargate security groups
+    const fargateSg = ec2.createFargateSecurityGroup({
+      name: "dashboard-fargate-sg",
+      vpcId: vpcResources.vpcId,
+      albSecurityGroupId: albSg.id,
     });
 
     // Create Application Load Balancer
@@ -87,7 +94,7 @@ export default class DashboardService extends Service {
       desiredCount: 2,
       taskDefinitionArn: taskDefinition.arn,
       vpcSubnetIds: vpcResources.publicSubnetIds,
-      vpcSecurityGroupIds: albSg.id.apply((id) => [id]),
+      vpcSecurityGroupIds: fargateSg.id.apply((id) => [id]),
       albTargetGroupArn: albTargetGroup.arn,
       httpsListener: httpsListener,
       haproxyContainerName: haproxyContainerName,

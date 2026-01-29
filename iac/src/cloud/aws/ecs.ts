@@ -1,5 +1,5 @@
-import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
+import * as pulumi from "@pulumi/pulumi";
 
 export function createEcsCluster(config: { clusterName: string; tags?: { [key: string]: string } }): aws.ecs.Cluster {
   const cluster = new aws.ecs.Cluster(config.clusterName, {

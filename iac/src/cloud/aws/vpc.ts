@@ -1,12 +1,10 @@
 import * as awsx from "@pulumi/awsx";
 
-interface VpcConfig {
+export function createVpc(config: {
   name: string;
   cidrBlock?: string;
   numberOfAvailabilityZones?: number;
-};
-
-export function createVpc(config: VpcConfig): awsx.ec2.Vpc {
+}): awsx.ec2.Vpc {
   const vpc = new awsx.ec2.Vpc(config.name, {
     cidrBlock: config.cidrBlock || "10.0.0.0/16",
     enableDnsHostnames: true,
