@@ -10,8 +10,8 @@ COPY docker/haproxy.local.cfg /usr/local/etc/haproxy/haproxy.cfg
 #      cat haproxy-cert.pem haproxy-key.pem > haproxy.pem
 COPY docker/certs/haproxy.pem /usr/local/etc/haproxy/certs/haproxy.pem
 
-# Expose ports (80 for HTTP redirect, 443 for HTTPS)
-EXPOSE 80 443
+# Expose port 8080
+EXPOSE 8080
 
 # Run HAProxy
 CMD ["haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg", "-db"]

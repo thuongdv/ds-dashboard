@@ -1,12 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 
-interface SecurityGroupConfig {
-  name: string;
-  vpcId: pulumi.Input<string>;
-}
-
-export function createSecurityGroup(config: SecurityGroupConfig): aws.ec2.SecurityGroup {
+export function createSecurityGroup(config: { name: string; vpcId: pulumi.Input<string> }): aws.ec2.SecurityGroup {
   const albSg = new aws.ec2.SecurityGroup(config.name, {
     vpcId: config.vpcId,
     ingress: [
