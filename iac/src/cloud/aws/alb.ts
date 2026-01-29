@@ -27,7 +27,17 @@ export function createAlbTargetGroup(targetGroupConfig: {
     protocol: targetGroupConfig.protocol,
     vpcId: targetGroupConfig.vpcId,
     targetType: "ip",
-    healthCheck: { path: "/", port: targetGroupConfig.port.toString() },
+    healthCheck: {
+      enabled: true,
+      path: "/health",
+      port: targetGroupConfig.port.toString(),
+      protocol: targetGroupConfig.protocol,
+      healthyThreshold: 2,
+      unhealthyThreshold: 3,
+      timeout: 5,
+      interval: 30,
+      matcher: "200",
+    },
   });
 
   return targetGroup;

@@ -110,6 +110,13 @@ export default class DashboardService extends Service {
         image: haproxyRepoUrl,
         essential: true,
         portMappings: [{ containerPort: 8080 }],
+        healthCheck: {
+          command: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"],
+          interval: 30,
+          timeout: 5,
+          retries: 3,
+          startPeriod: 10,
+        },
         logConfiguration: {
           logDriver: "awslogs",
           options: {
@@ -125,6 +132,13 @@ export default class DashboardService extends Service {
         image: nginxRepoUrl,
         essential: true,
         portMappings: [{ containerPort: 80 }],
+        healthCheck: {
+          command: ["CMD-SHELL", "wget -qO- http://localhost:80/health || exit 1"],
+          interval: 30,
+          timeout: 5,
+          retries: 3,
+          startPeriod: 10,
+        },
         logConfiguration: {
           logDriver: "awslogs",
           options: {

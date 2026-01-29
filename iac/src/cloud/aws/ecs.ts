@@ -77,6 +77,7 @@ export function createEcsFargateSpotService(config: {
           containerPort: 8080,
         },
       ],
+      healthCheckGracePeriodSeconds: 60,
     },
     { dependsOn: [config.httpsListener] },
   );
