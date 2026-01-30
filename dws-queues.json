@@ -1,0 +1,17 @@
+[
+  {
+    "name": "01.) General Ledger",
+    "standardName": "GL",
+    "storeStatusFile": "gl-queue-ids-tracker.txt"
+  },
+  {
+    "name": "02.) Account Payable",
+    "standardName": "AP",
+    "storeStatusFile": "ap-queue-ids-tracker.txt"
+  },
+  {
+    "name": "05.) Procurement",
+    "standardName": "PR",
+    "storeStatusFile": "pr-queue-ids-tracker.txt"
+  }
+]

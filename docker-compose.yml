@@ -1,0 +1,48 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.nginx
+    container_name: dashboard-app-nginx
+    expose:
+      - "80"
+    environment:
+      - NGINX_WORKER_PROCESSES=auto
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - dashboard-app-network
+    restart: unless-stopped
+
+  haproxy:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.haproxy.local
+    container_name: dashboard-app-haproxy
+    ports:
+      - "8080:8080"
+    depends_on:
+      nginx:
+        condition: service_healthy
+    environment:
+      - HAPROXY_CONFIG=/usr/local/etc/haproxy/haproxy.local.cfg
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - dashboard-app-network
+    restart: unless-stopped
+
+networks:
+  dashboard-app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
