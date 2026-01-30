@@ -108,7 +108,7 @@ export default class DashboardService extends Service {
       vpcSecurityGroupIds: fargateSg.id.apply((id) => [id]),
       albTargetGroupArn: albTargetGroup.arn,
       httpsListener: httpsListener,
-      haproxyContainerName: haproxyContainerName,
+      containerName: haproxyContainerName,
     });
 
     return {

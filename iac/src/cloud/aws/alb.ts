@@ -1,37 +1,37 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 
-export function createAlb(albConfig: {
+export function createAlb(options: {
   name: string;
   publicSubnetIds: pulumi.Input<string[]>;
   albSg: aws.ec2.SecurityGroup;
 }): aws.alb.LoadBalancer {
-  const alb = new aws.alb.LoadBalancer(albConfig.name, {
+  const alb = new aws.alb.LoadBalancer(options.name, {
     internal: false,
-    securityGroups: [albConfig.albSg.id],
-    subnets: albConfig.publicSubnetIds,
+    securityGroups: [options.albSg.id],
+    subnets: options.publicSubnetIds,
     loadBalancerType: "application",
   });
 
   return alb;
 }
 
-export function createAlbTargetGroup(targetGroupConfig: {
+export function createAlbTargetGroup(options: {
   name: string;
   vpcId: pulumi.Input<string>;
   port: number;
   protocol: string;
 }): aws.alb.TargetGroup {
-  const targetGroup = new aws.alb.TargetGroup(targetGroupConfig.name, {
-    port: targetGroupConfig.port,
-    protocol: targetGroupConfig.protocol,
-    vpcId: targetGroupConfig.vpcId,
+  const targetGroup = new aws.alb.TargetGroup(options.name, {
+    port: options.port,
+    protocol: options.protocol,
+    vpcId: options.vpcId,
     targetType: "ip",
     healthCheck: {
       enabled: true,
       path: "/health",
-      port: targetGroupConfig.port.toString(),
-      protocol: targetGroupConfig.protocol,
+      port: options.port.toString(),
+      protocol: options.protocol,
       healthyThreshold: 2,
       unhealthyThreshold: 3,
       timeout: 5,
@@ -43,12 +43,12 @@ export function createAlbTargetGroup(targetGroupConfig: {
   return targetGroup;
 }
 
-export function createHttpListenerToRedirectToHttps(httpConfig: {
+export function createHttpListenerToRedirectToHttps(options: {
   name: string;
   albArn: pulumi.Input<string>;
 }): aws.alb.Listener {
-  const httpListener = new aws.alb.Listener(httpConfig.name, {
-    loadBalancerArn: httpConfig.albArn,
+  const httpListener = new aws.alb.Listener(options.name, {
+    loadBalancerArn: options.albArn,
     port: 80,
     defaultActions: [
       {
@@ -61,22 +61,22 @@ export function createHttpListenerToRedirectToHttps(httpConfig: {
   return httpListener;
 }
 
-export function createHttpsListener(httpsConfig: {
+export function createHttpsListener(options: {
   name: string;
   albArn: pulumi.Input<string>;
   certificateArn: pulumi.Input<string>;
   targetGroupArn: pulumi.Input<string>;
 }): aws.alb.Listener {
-  const httpsListener = new aws.alb.Listener(httpsConfig.name, {
-    loadBalancerArn: httpsConfig.albArn,
+  const httpsListener = new aws.alb.Listener(options.name, {
+    loadBalancerArn: options.albArn,
     port: 443,
     protocol: "HTTPS",
     sslPolicy: "ELBSecurityPolicy-2016-08",
-    certificateArn: httpsConfig.certificateArn,
+    certificateArn: options.certificateArn,
     defaultActions: [
       {
         type: "forward",
-        targetGroupArn: httpsConfig.targetGroupArn,
+        targetGroupArn: options.targetGroupArn,
       },
     ],
   });
