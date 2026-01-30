@@ -1,15 +1,15 @@
 import * as awsx from "@pulumi/awsx";
 
-export function createVpc(config: {
+export function createVpc(options: {
   name: string;
   numberOfAvailabilityZones: number;
   cidrBlock?: string;
 }): awsx.ec2.Vpc {
-  const vpc = new awsx.ec2.Vpc(config.name, {
-    cidrBlock: config.cidrBlock || "10.0.0.0/16",
+  const vpc = new awsx.ec2.Vpc(options.name, {
+    cidrBlock: options.cidrBlock || "10.0.0.0/16",
     enableDnsHostnames: true,
     enableDnsSupport: true,
-    numberOfAvailabilityZones: config.numberOfAvailabilityZones,
+    numberOfAvailabilityZones: options.numberOfAvailabilityZones,
     natGateways: { strategy: "None" },
     subnetSpecs: [
       {
@@ -17,7 +17,7 @@ export function createVpc(config: {
         cidrMask: 24, // Creates 10.0.1.0/24 and 10.0.2.0/24...
       },
     ],
-    tags: { Name: config.name },
+    tags: { Name: options.name },
   });
 
   return vpc;
