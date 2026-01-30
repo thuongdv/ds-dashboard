@@ -2,14 +2,14 @@ import * as awsx from "@pulumi/awsx";
 
 export function createVpc(config: {
   name: string;
+  numberOfAvailabilityZones: number;
   cidrBlock?: string;
-  numberOfAvailabilityZones?: number;
 }): awsx.ec2.Vpc {
   const vpc = new awsx.ec2.Vpc(config.name, {
     cidrBlock: config.cidrBlock || "10.0.0.0/16",
     enableDnsHostnames: true,
     enableDnsSupport: true,
-    numberOfAvailabilityZones: config.numberOfAvailabilityZones || 2, // Automatically spreads across 2 AZs
+    numberOfAvailabilityZones: config.numberOfAvailabilityZones,
     natGateways: { strategy: "None" },
     subnetSpecs: [
       {

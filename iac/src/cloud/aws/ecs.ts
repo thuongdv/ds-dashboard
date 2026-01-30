@@ -1,9 +1,9 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 
-export function createEcsCluster(config: { clusterName: string; tags?: { [key: string]: string } }): aws.ecs.Cluster {
-  const cluster = new aws.ecs.Cluster(config.clusterName, {
-    name: config.clusterName,
+export function createEcsCluster(options: { clusterName: string; tags?: { [key: string]: string } }): aws.ecs.Cluster {
+  const cluster = new aws.ecs.Cluster(options.clusterName, {
+    name: options.clusterName,
     settings: [
       {
         name: "containerInsights",
@@ -11,15 +11,15 @@ export function createEcsCluster(config: { clusterName: string; tags?: { [key: s
       },
     ],
     tags: {
-      Name: config.clusterName,
-      ...config.tags,
+      Name: options.clusterName,
+      ...options.tags,
     },
   });
 
   return cluster;
 }
 
-export function createEcsFargateTaskDefinition(config: {
+export function createEcsFargateTaskDefinition(options: {
   taskName: string;
   family: string;
   cpu: string;
@@ -27,20 +27,20 @@ export function createEcsFargateTaskDefinition(config: {
   executionRoleArn: pulumi.Input<string>;
   containerDefinitions: pulumi.Input<string>;
 }): aws.ecs.TaskDefinition {
-  const taskDefinition = new aws.ecs.TaskDefinition(config.taskName, {
-    family: config.family,
-    cpu: config.cpu,
-    memory: config.memory,
+  const taskDefinition = new aws.ecs.TaskDefinition(options.taskName, {
+    family: options.family,
+    cpu: options.cpu,
+    memory: options.memory,
     networkMode: "awsvpc",
     requiresCompatibilities: ["FARGATE"],
-    executionRoleArn: config.executionRoleArn,
-    containerDefinitions: config.containerDefinitions,
+    executionRoleArn: options.executionRoleArn,
+    containerDefinitions: options.containerDefinitions,
   });
 
   return taskDefinition;
 }
 
-export function createEcsFargateSpotService(config: {
+export function createEcsFargateSpotService(options: {
   serviceName: string;
   clusterArn: pulumi.Input<string>;
   desiredCount: number;
@@ -49,13 +49,13 @@ export function createEcsFargateSpotService(config: {
   vpcSecurityGroupIds: pulumi.Input<string[]>;
   albTargetGroupArn: pulumi.Input<string>;
   httpsListener: aws.lb.Listener;
-  haproxyContainerName: string;
+  containerName: string;
 }): aws.ecs.Service {
   const appService = new aws.ecs.Service(
-    config.serviceName,
+    options.serviceName,
     {
-      cluster: config.clusterArn,
-      desiredCount: config.desiredCount,
+      cluster: options.clusterArn,
+      desiredCount: options.desiredCount,
       // --- COST OPTIMIZATION START ---
       capacityProviderStrategies: [
         {
@@ -64,22 +64,22 @@ export function createEcsFargateSpotService(config: {
         },
       ],
       // --- COST OPTIMIZATION END ---
-      taskDefinition: config.taskDefinitionArn,
+      taskDefinition: options.taskDefinitionArn,
       networkConfiguration: {
-        subnets: config.vpcSubnetIds,
-        securityGroups: config.vpcSecurityGroupIds,
+        subnets: options.vpcSubnetIds,
+        securityGroups: options.vpcSecurityGroupIds,
         assignPublicIp: true,
       },
       loadBalancers: [
         {
-          targetGroupArn: config.albTargetGroupArn,
-          containerName: config.haproxyContainerName,
+          targetGroupArn: options.albTargetGroupArn,
+          containerName: options.containerName,
           containerPort: 8080,
         },
       ],
       healthCheckGracePeriodSeconds: 60,
     },
-    { dependsOn: [config.httpsListener] },
+    { dependsOn: [options.httpsListener] },
   );
 
   return appService;
